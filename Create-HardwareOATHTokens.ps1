@@ -1,6 +1,6 @@
 <#  ==============================================================================================================================================
     Create-HardwareOATHTokens.ps1:  From a CSV file taken as a script parameter this script
-                                    creates unassigned and unactivated Hardware OATH token object(s) in Entra ID
+                                    creates unassigned and unactivated Hardware OATH token object(s) in Entra ID using the PATCH Graph method
     Usage:
     ======
         .\Create-HardwareOATHTokens.ps1 -csvFilePath <PathToYourCSV>
@@ -53,29 +53,27 @@ $scopes = @("Policy.ReadWrite.AuthenticationMethod")
 # Authenticate and connect to Microsoft Graph
 Connect-MgGraph -Scopes $scopes
 
-# Read the CSV file
-$tokens = Import-Csv -Path $csvFilePath
+# Import the CSV file
+$csvData = Import-Csv -Path $csvFilePath
 
-# Loop through each token in the CSV file and create the Hardware OATH token object
-foreach ($token in $tokens) {
-     $body = @{
-        manufacturer = $token.manufacturer
-        model = $token.model
-        serialNumber = $token.serialNumber
-        secretKey = $token.secretKey
-        timeIntervalInSeconds = $token.timeIntervalInSeconds
-        hashFunction = $token.hashFunction
-    }
-
-    # Convert the body to JSON
-    $jsonBody = $body | ConvertTo-Json
-
-    # Create the Hardware OATH token object using Invoke-MgGraphRequest
-    Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/beta/directory/authenticationMethodDevices/hardwareOathDevices" -Body $jsonBody -ContentType "application/json"
-    Write-Host
-    # This 1 second delay is required to allow the POST action to complete
-    Start-Sleep -Seconds 1
+# Create the JSON data structure
+$jsonData = @{
+    "@context" = "#`$delta"
+    "value" = $csvData
 }
+
+# Convert the data structure to JSON
+$jsonBody = $jsonData | ConvertTo-Json -Depth 5
+
+# Save the json to file for review
+$jsonFilePath = ".\CreateHardwareOATHTokens.json"
+$jsonBody | Out-File -FilePath $jsonFilePath
+
+# Display the JSON data
+# $jsonBody
+
+# Create the Hardware OATH token object using PATCH method of Invoke-MgGraphRequest
+Invoke-MgGraphRequest -Method PATCH -Uri "https://graph.microsoft.com/beta/directory/authenticationMethodDevices/hardwareOathDevices" -Body $jsonBody -ContentType "application/json"
 
 # Disconnect from Microsoft Graph
 Disconnect-MgGraph
