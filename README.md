@@ -11,6 +11,6 @@ Until Microsoft make Powershell cmdlets available I created a couple of scripts 
 
 The Create and Delete scripts take a CSV file as input (command line parameter) and the header row must have the following values **serialNumber,secretKey,timeIntervalInSeconds,manufacturer,model,hashFunction** which correspond to the relevant columns provided by the Hardware token vendor.  However the CSV files provided by the vendors for Entra utilise the CSV template used by the Entra Portal upload method which is not compatible with these scripts (NOTE: the Entra Portal method of Hardware Token upload requires that the Hardware Tokens are pre-assigned to user UPNs). It should not be too difficult to adjust the CSV file header accordingly.
 
-The Create and Delete scripts log a transcript of the script operations in a log file named afetr the script and saved to the location the script is run from.
+The Create and Delete scripts log a transcript of the script operations in a log file named after the script and saved to the location the script is run from.
 
 Further informmation on the scripts is provided in the header of the script.
