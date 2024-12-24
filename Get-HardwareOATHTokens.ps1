@@ -1,5 +1,5 @@
 <#  ==============================================================================================================================================
-    Get-HardwareOATHTokens.ps1:  This script Lists unassigned and unactivated Hardware OATH token object(s) in Entra ID
+    Get-HardwareOATHTokens.ps1:  This script Lists Hardware OATH token object(s) in Entra ID
     Usage:
     ======
         .\Get-HardwareOATHTokens.ps1
