@@ -1,6 +1,6 @@
 <#  ==============================================================================================================================================
     Delete-HardwareOATHTokens.ps1:  From a CSV file taken as a script parameter this script
-                                    creates unassigned and unactivated Hardware OATH token object(s) in Entra ID
+                                    deletes Hardware OATH token object(s) in Entra ID
     Usage:
     ======
         .\Delete-HardwareOATHTokens.ps1 -csvFilePath <PathToYourCSV>
