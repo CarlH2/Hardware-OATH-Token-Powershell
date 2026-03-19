@@ -20,6 +20,7 @@
    Author: Carl Harrison (Microsoft CSU)
            
    V1.0:   First Cut
+   V1.1:   Added Error catching. Specifically for when Tokens already exist in Tenant
 
 Disclaimer:
 This sample script is not supported under any Microsoft standard support program or service. 
@@ -70,11 +71,21 @@ foreach ($token in $tokens) {
     # Convert the body to JSON
     $jsonBody = $body | ConvertTo-Json
 
-    # Create the Hardware OATH token objects using the POST method of Invoke-MgGraphRequest to create each object
-    Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/beta/directory/authenticationMethodDevices/hardwareOathDevices" -Body $jsonBody -ContentType "application/json"
-    Write-Host
-    # This 1 second delay is required to allow the POST action to complete
-    Start-Sleep -Seconds 1
+    try {
+        # Create the Hardware OATH token objects using the POST method of Invoke-MgGraphRequest to create each object
+        Invoke-MgGraphRequest -Method POST -Uri "https://graph.microsoft.com/beta/directory/authenticationMethodDevices/hardwareOathDevices" -Body $jsonBody -ContentType "application/json"
+        Write-Host $jsonBody
+        # This 1 second delay is required to allow the POST action to complete
+        Start-Sleep -Seconds 1
+    }
+    catch {
+        Write-Host
+        Write-Host "Error: $($_.Exception.Message): Possible Duplicate" -ForegroundColor Red
+        Write-Host $jsonBody -ForegroundColor Red
+    }
+    finally {
+        Write-Host
+    }
 }
 
 # Disconnect from Microsoft Graph
