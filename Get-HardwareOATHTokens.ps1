@@ -11,6 +11,7 @@
    Author: Carl Harrison (Microsoft CSU)
            
    V1.0:   First Cut
+   V1.1:   Adjusted to enable export when more than 1000 records exist
 
 Disclaimer:
 This sample script is not supported under any Microsoft standard support program or service. 
@@ -36,14 +37,25 @@ $scopes = @("Policy.Read.All")
 # Authenticate and connect to Microsoft Graph
 Connect-MgGraph -Scopes $scopes
 
-$hardwareOATHTokensData = Invoke-MgGraphRequest -Method GET -Uri "https://graph.microsoft.com/beta/directory/authenticationMethodDevices/hardwareOathDevices" -OutputType PSObject
+$uri = "https://graph.microsoft.com/beta/directory/authenticationMethodDevices/hardwareOathDevices"
 
-# Export the results array to a csv file
-# Set up output file with date time stamp
-$dateTime=get-date -format s
-$dateTime=$dateTime -replace ":","_"
-$dateTime=$dateTime.ToString()
-$hardwareOATHTokensData.value | Export-Csv -Path ".\HardwareOATHTokens$dateTime.csv" -NoTypeInformation
+$all = @()
+
+do {
+    $resp = Invoke-MgGraphRequest -Method GET -Uri $uri -OutputType PSObject
+    if ($resp.value) {
+        $all += $resp.value
+    }
+    $uri = $resp.'@odata.nextLink'
+} while ($uri)
+
+# Output file with date time stamp
+$dateTime = (Get-Date -Format s) -replace ":", "_"
+$outFile = ".\HardwareOATHTokens$dateTime.csv"
+
+$all | Export-Csv -Path $outFile -NoTypeInformation
+
+Write-Host "Exported $($all.Count) rows to $outFile"
 
 # Disconnect from Microsoft Graph
 Disconnect-MgGraph
